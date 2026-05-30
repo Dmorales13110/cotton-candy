@@ -20,12 +20,11 @@ export const useBookingForm = () => {
       guestCount: isInRange({ min: 1, max: 5000 }, 'Number of guests must be between 1 and 5000'),
       duration: isNotEmpty('Please select service duration'),
       location: isNotEmpty('Please enter event location'),
-      flavors: {
-        validate: (value: FlavorValue[]) => {
-          if (value.length === 0) return 'Please select at least one flavor';
-          if (value.length > 2) return 'You can only select exactly 2 flavors';
-          return null;
-        },
+      // Fixed: Custom validator function for flavors array
+      flavors: (value: FlavorValue[]) => {
+        if (value.length === 0) return 'Please select at least one flavor';
+        if (value.length > 2) return 'You can only select exactly 2 flavors';
+        return null;
       },
     },
   });
