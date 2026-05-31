@@ -13,10 +13,26 @@ import {
   ThemeIcon,
   Group,
   Alert,
+  Textarea,
   rem,
+  LoadingOverlay,
 } from '@mantine/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Cake, Users, Clock, MapPin, Check, AlertCircle } from 'lucide-react';
+import {
+  Cake,
+  Users,
+  Clock,
+  MapPin,
+  Check,
+  AlertCircle,
+  User,
+  Mail,
+  Phone,
+  MessageSquare,
+  Calendar,
+  Send,
+  Sparkles,
+} from 'lucide-react';
 import { colors } from '../constants/colors';
 import { flavors, eventTypes, durationOptions } from '../constants/flavors';
 import { useBookingForm } from '../hooks/useBookingForm';
@@ -26,13 +42,35 @@ interface BookingFormProps {
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
-  const { form, submitted, selectedFlavors, handleFlavorChange, handleSubmit } = useBookingForm();
+  const {
+    form,
+    submitted,
+    isSubmitting,
+    errorMessage,
+    setErrorMessage,
+    selectedFlavors,
+    handleFlavorChange,
+    handleSubmit
+  } = useBookingForm();
 
   React.useEffect(() => {
     if (submitted && onSubmitSuccess) {
       onSubmitSuccess();
     }
   }, [submitted, onSubmitSuccess]);
+
+  const contactMethods = [
+    { value: 'email', label: 'Email' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'both', label: 'Both' },
+  ];
+
+  const contactTimes = [
+    { value: 'morning', label: 'Morning (9AM - 12PM)' },
+    { value: 'afternoon', label: 'Afternoon (12PM - 5PM)' },
+    { value: 'evening', label: 'Evening (5PM - 8PM)' },
+    { value: 'anytime', label: 'Anytime' },
+  ];
 
   return (
     <Paper
@@ -43,8 +81,15 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
         backgroundColor: colors.white,
         border: `1px solid ${colors.yellow}`,
         boxShadow: `0 20px 35px -10px rgba(0,0,0,0.05), 0 0 0 1px ${colors.yellow}40`,
+        position: 'relative',
       }}
     >
+      <LoadingOverlay
+        visible={isSubmitting}
+        loaderProps={{ color: colors.teal }}
+        overlayProps={{ blur: 2 }}
+      />
+
       <AnimatePresence mode="wait">
         {submitted && (
           <motion.div
@@ -55,72 +100,149 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
           >
             <Alert
               icon={<Check size={20} />}
-              title="Thank you for your inquiry!"
+              title="Booking Request Received!"
               color="teal"
               radius="md"
               variant="filled"
               mb="lg"
               style={{ backgroundColor: colors.teal, borderColor: colors.teal }}
             >
-              Your booking request has been received. We'll contact you shortly with your final quote and Venmo details to complete your 50% deposit.
+              <Text size="sm" c="white" mb="xs">
+                Thank you for your interest in Cotton Candy!
+              </Text>
+              <Text size="sm" c="white">
+                We've received your booking request and will contact you within 24 hours with your custom quote and Venmo payment details to secure your 50% deposit.
+              </Text>
             </Alert>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {errorMessage && (
+        <Alert
+          icon={<AlertCircle size={20} />}
+          title="Submission Error"
+          color="red"
+          radius="md"
+          mb="lg"
+          withCloseButton
+          onClose={() => setErrorMessage('')}
+        >
+          {errorMessage}
+        </Alert>
+      )}
+
       <form onSubmit={handleSubmit}>
         <Stack gap="lg">
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-            <Select
-              label="Type of Event"
-              placeholder="Select event type"
-              data={eventTypes}
-              leftSection={<Cake size={18} color={colors.pink} />}
-              {...form.getInputProps('eventType')}
-              styles={{
-                label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
-                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
-              }}
-            />
-            <NumberInput
-              label="Number of Guests"
-              placeholder="Estimated guests"
-              min={1}
-              max={5000}
-              leftSection={<Users size={18} color={colors.pink} />}
-              {...form.getInputProps('guestCount')}
-              styles={{
-                label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
-                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
-              }}
-            />
-          </SimpleGrid>
+          {/* Section: Personal Information */}
+          <Box>
+            <Group gap="xs" mb="md">
+              <User size={18} color={colors.pink} />
+              <Text fw={600} size="md" style={{ color: colors.text }}>
+                Your Information
+              </Text>
+            </Group>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+              <TextInput
+                label="Full Name"
+                placeholder="John Doe"
+                leftSection={<User size={18} color={colors.pink} />}
+                {...form.getInputProps('fullName')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <TextInput
+                label="Email Address"
+                placeholder="john@example.com"
+                leftSection={<Mail size={18} color={colors.pink} />}
+                {...form.getInputProps('email')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <TextInput
+                label="Phone Number"
+                placeholder="(801) 555-0123"
+                leftSection={<Phone size={18} color={colors.pink} />}
+                {...form.getInputProps('phone')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <Select
+                label="Preferred Contact Method"
+                data={contactMethods}
+                leftSection={<MessageSquare size={18} color={colors.pink} />}
+                {...form.getInputProps('preferredContactMethod')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+            </SimpleGrid>
+          </Box>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-            <Select
-              label="Service Time / Duration"
-              placeholder="How many hours?"
-              data={durationOptions}
-              leftSection={<Clock size={18} color={colors.pink} />}
-              {...form.getInputProps('duration')}
-              styles={{
-                label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
-                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
-              }}
-            />
-            <TextInput
-              label="Event Location"
-              placeholder="Venue address in Utah"
-              leftSection={<MapPin size={18} color={colors.pink} />}
-              {...form.getInputProps('location')}
-              styles={{
-                label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
-                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
-              }}
-            />
-          </SimpleGrid>
+          {/* Section: Event Details */}
+          <Box>
+            <Group gap="xs" mb="md">
+              <Sparkles size={18} color={colors.teal} />
+              <Text fw={600} size="md" style={{ color: colors.text }}>
+                Event Details
+              </Text>
+            </Group>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+              <Select
+                label="Type of Event"
+                placeholder="Select event type"
+                data={eventTypes}
+                leftSection={<Cake size={18} color={colors.pink} />}
+                {...form.getInputProps('eventType')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <NumberInput
+                label="Number of Guests"
+                placeholder="Estimated guests"
+                min={1}
+                max={5000}
+                leftSection={<Users size={18} color={colors.pink} />}
+                {...form.getInputProps('guestCount')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <Select
+                label="Service Time / Duration"
+                placeholder="How many hours?"
+                data={durationOptions}
+                leftSection={<Clock size={18} color={colors.pink} />}
+                {...form.getInputProps('duration')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <TextInput
+                label="Event Location"
+                placeholder="Venue address in Utah"
+                leftSection={<MapPin size={18} color={colors.pink} />}
+                {...form.getInputProps('location')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+            </SimpleGrid>
+          </Box>
 
-          {/* Flavors section with strict 2 selection rule */}
+          {/* Flavors section */}
           <Box>
             <Text fw={500} size="sm" mb="xs" c={colors.text}>
               Cotton Candy Flavors <Text component="span" c={colors.pink} size="xs">(Select exactly 2)</Text>
@@ -145,6 +267,39 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
                 {form.errors.flavors}
               </Text>
             )}
+          </Box>
+
+          {/* Special Requests */}
+          <Box>
+            <Text fw={500} size="sm" mb="xs" c={colors.text}>
+              Special Requests or Notes
+            </Text>
+            <Textarea
+              placeholder="Any special requests, dietary considerations, or questions for us?"
+              minRows={3}
+              leftSection={<MessageSquare size={18} color={colors.pink} />}
+              {...form.getInputProps('specialRequests')}
+              styles={{
+                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+              }}
+            />
+          </Box>
+
+          {/* Best Time to Contact */}
+          <Box>
+            <Text fw={500} size="sm" mb="xs" c={colors.text}>
+              Best Time to Contact You
+            </Text>
+            <Select
+              placeholder="Select preferred contact time"
+              data={contactTimes}
+              leftSection={<Calendar size={18} color={colors.pink} />}
+              {...form.getInputProps('bestTimeToContact')}
+              styles={{
+                label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+              }}
+            />
           </Box>
 
           {/* Payment Policy Callout Box */}
@@ -186,6 +341,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
             radius="xl"
             fullWidth
             mt="md"
+            loading={isSubmitting}
+            loaderProps={{ type: 'dots' }}
             style={{
               backgroundColor: colors.teal,
               transition: 'transform 0.2s ease, box-shadow 0.2s ease',
@@ -198,6 +355,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = 'none';
             }}
+            leftSection={<Send size={18} />}
           >
             Request Booking
           </Button>
