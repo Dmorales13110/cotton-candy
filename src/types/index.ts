@@ -1,4 +1,3 @@
-// types/index.ts
 export interface FormValues {
   // Personal Information
   fullName: string;
@@ -6,6 +5,8 @@ export interface FormValues {
   phone: string;
   // Event Details
   eventType: EventTypeValue | '';
+  eventDate: Date | null;
+  eventTime: string;
   guestCount: number;
   duration: DurationValue | '';
   location: string;
@@ -19,6 +20,7 @@ export interface FormValues {
 export type FlavorValue = 'green-apple' | 'blue-razz' | 'pink-vanilla' | 'pineapple' | 'cherry' | 'grape';
 export type EventTypeValue = 'wedding' | 'birthday' | 'corporate' | 'baby-shower' | 'graduation' | 'festival' | 'other';
 export type DurationValue = '1' | '2' | '3' | '4' | '5';
+
 export interface Flavor {
   label: string;
   value: FlavorValue;

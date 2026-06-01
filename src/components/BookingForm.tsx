@@ -17,6 +17,7 @@ import {
   rem,
   LoadingOverlay,
 } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Cake,
@@ -37,20 +38,23 @@ import { colors } from '../constants/colors';
 import { flavors, eventTypes, durationOptions } from '../constants/flavors';
 import { useBookingForm } from '../hooks/useBookingForm';
 
+// Import Mantine Dates styles
+import '@mantine/dates/styles.css';
+
 interface BookingFormProps {
   onSubmitSuccess?: () => void;
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
-  const {
-    form,
-    submitted,
-    isSubmitting,
-    errorMessage,
-    setErrorMessage,
-    selectedFlavors,
-    handleFlavorChange,
-    handleSubmit
+  const { 
+    form, 
+    submitted, 
+    isSubmitting, 
+    errorMessage, 
+    setErrorMessage, 
+    selectedFlavors, 
+    handleFlavorChange, 
+    handleSubmit 
   } = useBookingForm();
 
   React.useEffect(() => {
@@ -70,6 +74,23 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
     { value: 'afternoon', label: 'Afternoon (12PM - 5PM)' },
     { value: 'evening', label: 'Evening (5PM - 8PM)' },
     { value: 'anytime', label: 'Anytime' },
+  ];
+
+  // Simple time options
+  const timeOptions = [
+    { value: '9:00 AM', label: '9:00 AM' },
+    { value: '10:00 AM', label: '10:00 AM' },
+    { value: '11:00 AM', label: '11:00 AM' },
+    { value: '12:00 PM', label: '12:00 PM' },
+    { value: '1:00 PM', label: '1:00 PM' },
+    { value: '2:00 PM', label: '2:00 PM' },
+    { value: '3:00 PM', label: '3:00 PM' },
+    { value: '4:00 PM', label: '4:00 PM' },
+    { value: '5:00 PM', label: '5:00 PM' },
+    { value: '6:00 PM', label: '6:00 PM' },
+    { value: '7:00 PM', label: '7:00 PM' },
+    { value: '8:00 PM', label: '8:00 PM' },
+    { value: '9:00 PM', label: '9:00 PM' },
   ];
 
   return (
@@ -206,6 +227,29 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
                   input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
                 }}
               />
+              <DatePickerInput
+                label="Event Date"
+                placeholder="Select event date"
+                leftSection={<Calendar size={18} color={colors.pink} />}
+                {...form.getInputProps('eventDate')}
+                minDate={new Date()}
+                valueFormat="MMMM D, YYYY"
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
+              <Select
+                label="Event Start Time"
+                placeholder="Select start time"
+                data={timeOptions}
+                leftSection={<Clock size={18} color={colors.pink} />}
+                {...form.getInputProps('eventTime')}
+                styles={{
+                  label: { color: colors.text, fontWeight: 500, marginBottom: 6 },
+                  input: { borderColor: '#e0e0e0', '&:focus': { borderColor: colors.teal } },
+                }}
+              />
               <NumberInput
                 label="Number of Guests"
                 placeholder="Estimated guests"
@@ -242,6 +286,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ onSubmitSuccess }) => {
             </SimpleGrid>
           </Box>
 
+          {/* Rest of the form remains the same */}
           {/* Flavors section */}
           <Box>
             <Text fw={500} size="sm" mb="xs" c={colors.text}>
