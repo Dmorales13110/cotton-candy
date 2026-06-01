@@ -83,7 +83,7 @@ export const sendBookingEmail = async (formData: any): Promise<EmailResponse> =>
             to_email: templateParams.email,
         };
 
-        const clientResponse = await emailjs.send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, PUBLIC_KEY);
+        await emailjs.send(SERVICE_ID, CLIENT_TEMPLATE_ID, clientParams, PUBLIC_KEY);
 
         return {
             success: true,
